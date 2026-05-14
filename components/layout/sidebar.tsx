@@ -1,0 +1,2 @@
+const links = ["Dashboard","Annual Training Plan","Mesocycles","Microcycles","Training Sessions","Drill Database","Game Sheets","Players","Squad Management","Training Concepts","Reports","Settings"];
+export function Sidebar() { return <aside className="w-72 border-r bg-white p-4"><h1 className="mb-4 text-xl font-bold">TrainerPro Academy</h1><nav className="space-y-2">{links.map((item) => <div key={item} className="rounded px-3 py-2 text-sm hover:bg-slate-100">{item}</div>)}</nav></aside>; }
