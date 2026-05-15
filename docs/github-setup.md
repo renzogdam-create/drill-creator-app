@@ -1,48 +1,119 @@
-# Publish TrainerPro Academy to GitHub
+# Exact Guide: Publish and Run TrainerPro Academy
 
-Because this environment has no GitHub remote configured, use these steps from your machine (or add a remote here) to publish the code.
+Use this guide exactly as written to get the project on GitHub and running locally.
 
-## 1) Create a GitHub repository
+## A) Prerequisites (one-time)
 
-- Go to https://github.com/new
-- Repository name: `trainerpro-academy` (or your preferred name)
-- Visibility: Public or Private
-- Do **not** initialize with README (this repo already has commits)
+- Git installed (`git --version`)
+- Node.js 20+ and npm (`node -v`, `npm -v`)
+- GitHub account
+- Supabase account
 
-## 2) Add remote and push
+---
 
-Run in this repo root:
+## B) Create GitHub repository
+
+1. Open: https://github.com/new
+2. Repository name: `trainerpro-academy`
+3. Visibility: choose Public or Private
+4. **Important:** keep “Add a README” unchecked
+5. Click **Create repository**
+
+After creation, copy your repo URL, for example:
+- SSH: `git@github.com:YOUR_USERNAME/trainerpro-academy.git`
+- HTTPS: `https://github.com/YOUR_USERNAME/trainerpro-academy.git`
+
+---
+
+## C) Push current project to GitHub
+
+Run these commands from the project root:
 
 ```bash
-git remote add origin git@github.com:<YOUR_GITHUB_USERNAME>/trainerpro-academy.git
-# or HTTPS:
-# git remote add origin https://github.com/<YOUR_GITHUB_USERNAME>/trainerpro-academy.git
+cd /path/to/drill-creator-app
+git status
+git remote remove origin 2>/dev/null || true
+git remote add origin git@github.com:YOUR_USERNAME/trainerpro-academy.git
+# If you prefer HTTPS:
+# git remote add origin https://github.com/YOUR_USERNAME/trainerpro-academy.git
 
 git branch -M main
 git push -u origin main
 ```
 
-## 3) Verify on GitHub
+If GitHub asks for authentication:
+- SSH: ensure your SSH key is added to GitHub.
+- HTTPS: use a GitHub Personal Access Token as password.
 
-- Open your repo URL.
-- Confirm files like `prisma/schema.prisma`, `app/`, and `docs/architecture.md` are visible.
+---
 
-## 4) Optional: connect to Vercel
+## D) Verify code on GitHub
 
-- Import the GitHub repo in Vercel.
-- Add env vars from `.env.example`.
-- Deploy.
+1. Open `https://github.com/YOUR_USERNAME/trainerpro-academy`
+2. Confirm these paths exist:
+   - `app/(dashboard)/page.tsx`
+   - `prisma/schema.prisma`
+   - `docs/architecture.md`
+3. Open **Commits** tab and verify latest commit is present.
 
-## 5) Optional: open a pull request workflow
+---
 
-For future work:
+## E) Create Supabase project + database URL
+
+1. Create a new project at https://supabase.com/dashboard
+2. In **Project Settings → Database**, copy the Postgres connection string
+3. In **Project Settings → API**, copy:
+   - `Project URL`
+   - `anon public` key
+
+---
+
+## F) Configure local environment
+
+From project root:
 
 ```bash
-git checkout -b feature/phase-2
-# make changes
-git add .
-git commit -m "Phase 2: core CRUD and validations"
-git push -u origin feature/phase-2
+cp .env.example .env.local
 ```
 
-Then open a PR on GitHub.
+Fill `.env.local` with real values:
+
+```env
+DATABASE_URL=postgresql://...
+NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
+```
+
+---
+
+## G) Install and run locally
+
+```bash
+npm install
+npx prisma generate
+npx prisma db push
+npm run dev
+```
+
+Open:
+- App: `http://localhost:3000`
+- Health check: `http://localhost:3000/api/health`
+
+---
+
+## H) Optional deploy to Vercel from GitHub
+
+1. Go to https://vercel.com/new
+2. Import `trainerpro-academy` repo
+3. Add environment variables from `.env.local`
+4. Deploy
+5. Add Vercel URL in Supabase Auth redirect settings
+
+---
+
+## I) Troubleshooting
+
+- `npm install` fails with 403: check corporate/proxy registry restrictions.
+- Prisma connection error: verify `DATABASE_URL` and database is active.
+- Auth callback issues: confirm Supabase redirect URLs include local and Vercel URLs.
